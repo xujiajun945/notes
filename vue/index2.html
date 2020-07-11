@@ -1,0 +1,105 @@
+<html>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <body>
+        <div id="app">
+            <!-- 通过自定义事件系统, 父组件可以监听子组件的事件 -->
+            <div v-bind:style="{ fontSize: postFontSize + 'em' }">
+                <blog-post
+                    v-for="post in posts"
+                    v-bind:key="post.id"
+                    v-bind:post="post"
+                    v-on:enlarge="postFontSize += $event"
+                    v-on:listener="componentListener"
+                ></blog-post>
+            </div>
+            <br>
+<!--            <cutom-input-->
+<!--                v-model="searchText"-->
+<!--            ></cutom-input>-->
+            <!--
+                上面的代码等价于:
+                <cutom-input
+                    v-bind:value="searchText"
+                    v-on:input="searchText = $event.target.value"
+                ></cutom-input>
+             -->
+
+            <!-- 通过插槽分发内容 -->
+            <alert-box>
+                Something bad happened
+            </alert-box>
+            <br>
+            <!-- 动态组件 -->
+            <!--
+                vue支持动态组件, 使用<component></component>标签, 为其绑定一个特殊的is属性
+                这个标签的名称可以是任意的, 甚至可以是一个原生的html标签, 但绑定is属性后, 他将
+                不再被视为一个原生的html标签, 而是一个自定义组件, 如果想让这个原生html绑定is属性
+                后, 仍然能使用其原生的dom property, 需要对这些原生的property添加.prop修饰
+             -->
+            <component v-bind:is="currentTab"></component>
+            <input type="text" v-bind:is="currentTab" v-bind:placeholder="123">
+            <!-- 在有约束的标签下使用自定义组件 -->
+            <!--
+                有一些html元素, 对于哪些元素可以出现在其内部有严格的要求, 这个时候我们如果在其内部使用自定义组件, 将会出错
+                例如: 如下将会出错
+                <table>
+                    <blog-post></blog-post>
+                </table>
+                我们可以使用is标签来变通
+             -->
+            <table>
+                <tr is="blog-post"></tr>
+            </table>
+        </div>
+    </body>
+    <script>
+        Vue.component('blog-post', {
+            template: `
+                <div class="blog-post">
+                    <h3>{{ post.title }}</h3>
+                    <button v-on:click="$emit('enlarge', 0.1)">
+                        Enlarge text
+                    </button>
+                    <br>
+                    <button v-on:click="$emit('listener', 0.1)">test</button>
+                    <div v-html="post.content"></div>
+                </div>
+            `,
+            props: ['post']
+        });
+        Vue.component('custom-input', {
+            template: `
+                <input
+                    v-bind:value="value"
+                    v-on:input="$emit('input', $event.target.value)"
+                >
+            `,
+            props: ['value']
+        });
+        Vue.component('alert-box', {
+            template: `
+                <div class="demo-alert-box">
+                    <strong>Error!</strong>
+                    <slot></slot>
+                </div>
+            `,
+        });
+        let vm = new Vue({
+            el: '#app',
+            data: {
+                posts: [
+                    { id: 1, title: 'My journey with Vue' },
+                    { id: 2, title: 'Blogging with Vue' },
+                    { id: 3, title: 'Why Vue is so fun' }
+                ],
+                postFontSize: 1,
+                currentTab: 'custom-input'
+            },
+            methods: {
+                componentListener: function (params) {
+                    console.log(params);
+                }
+            }
+        });
+    </script>
+</html>

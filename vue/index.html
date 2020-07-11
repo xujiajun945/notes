@@ -1,0 +1,181 @@
+<html>
+	<head>
+		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	</head>
+	<body>
+		<div id="app">
+			<div>
+				{{ message }}
+			</div>
+			<span v-bind:title="date">
+				鼠标停留查看信息
+			</span>
+			<ol>
+				<li v-for="todo in todos">
+					{{ todo.text }}
+				</li>
+			</ol>
+			<br/>
+			<p>{{ info }}</p>
+			<button v-on:click="reverseMessage">反转消息</button>
+			<br/>
+			<p>{{ description }}</p>
+			<input type="text" v-model="description">
+			<br/>
+			<ol>
+				<todo-item
+					v-for="item in groceryList"
+					v-bind:todo="item"
+					v-bind:key="item.id"
+				></todo-item>
+			</ol>
+			<br>
+			<p>Using mustaches: {{ rawHtml }}</p>
+			<p>Using v-html directive: <span v-html="rawHtml"></span></p>
+			<br>
+			<!-- 使用javascript表达式 -->
+			<div>
+				{{ number + 1 }}
+				<span>{{ bol ? 0 : 1 }}</span>
+				<span>{{ info.split('').reverse().join('') }}</span>
+				<todo-item v-bind:todo="groceryList[0]"></todo-item>
+			</div>
+			<br>
+			<p v-if="bol">现在你看到我了</p>
+			<br>
+			<a href="" v-on:[event]="doSomething">test</a>
+			<br>
+			<!-- 计算属性 -->
+			<div>
+				<p>Original message: {{ message }}</p>
+				<p>Computed reversed message: {{ reversedMessage }}</p>
+			</div>
+			<br>
+			<!-- v-if -->
+			<template v-if="shown">
+				<h1>Title</h1>
+				<button>test v-if</button>
+			</template>
+			<template v-else>
+				<p>没有Title</p>
+				<span>没有span</span>
+			</template>
+			<button v-on:click="showTitle">show Title</button>
+			<!-- v-show -->
+			<div v-show="shown" style="color: #00ac4b; height: 100px; width: 300px">color</div>
+			<!-- v-for -->
+			<ul>
+				<!-- 遍历数组 -->
+				<li v-for="(item, index) in itemList">
+					{{ message }} - {{ index }} - {{ item.message }}
+				</li>
+			</ul>
+			<br>
+			<ul>
+				<!-- 遍历对象 -->
+				<li v-for="(param1, param2, param3) in object">
+					{{ param3 }} - {{ param2 }} : {{ param1 }}
+				</li>
+			</ul>
+			<!-- component v-for -->
+			<diy-component
+				v-for="(item, index) in contentList"
+				v-bind:content="item"
+			></diy-component>
+		</div>
+	</body>
+	<script >
+		/* 定义组件 */
+		Vue.component('todo-item', {
+			props: ['todo'],
+			template: '<li>{{ todo.text }}</li>'
+		});
+		Vue.component('diy-component', {
+			template: `\
+				<ul>\
+					<li>{{ content }}\<button v-on:click="componentClick(content)">button</button></li>
+				</ul>\
+			`,
+			props: ['content'],
+			methods: {
+				componentClick: function (param) {
+					console.log(param);
+				}
+			}
+		});
+		var app = new Vue({
+			el: '#app',
+			data: {
+				message: 'Hello Vue!',
+				date: '加载于: ' + new Date().toLocaleString(),
+				todos: [
+					{ text: '学习 JavaScript' },
+					{ text: '学习 Vue' },
+					{ text: '整个牛项目' }
+				],
+				info: 'test reverse method!',
+				description: 'test v-model',
+				groceryList: [
+					{id: 0, text: '蔬菜'},
+					{id: 1, text: '奶酪'},
+					{id: 2, text: '随便'}
+				],
+				rawHtml: '<span style="color: red">This should be red.</span>',
+				number: 0,
+				bol: false,
+				event: new Date().getMilliseconds() % 2 === 0 ? 'click' : 'focus',
+				// reverseMessage: this.message.split('').reverse().join(''),
+				firstName: 'Foo',
+				lastName: 'Bar',
+				shown: false,
+				itemList: [
+					{ message: 'messageOne' },
+					{ message: 'messageTwo' },
+					{ message: 'messageThree' }
+				],
+				object: {
+					id: 1,
+					name: "xujiajun",
+					age: 18
+				},
+				contentList: [
+					'one', 'two'
+				]
+			},
+			methods: {
+				reverseMessage: function () {
+					this.info = this.info.split('').reverse().join('');
+				},
+				doSomething: function () {
+					alert('hello vue!');
+				},
+				showTitle: function () {
+					this.shown = !this.shown;
+				}
+			},
+			computed: {
+				/*
+				 * 1. 函数返回值作为函数名的getter函数
+				 * 2. 计算属性的值将会被缓存起来, 除非它依赖的属性发生变化, 否则每次调用将不会重新计算
+				 * 3. 如果不希望有缓存, 应该使用method来替代computed
+				 * 4. 计算属性默认只有getter, 如果需要setter, 写法如下面: fullName
+				 */
+				reversedMessage: function () {
+					return this.message.split('').reverse().join('');
+				},
+				fullName: {
+					// getter
+					get: function () {
+						return this.firstName + ' ' + this.lastName;
+					},
+					// setter
+					set: function (newValue) {
+						let names = newValue.split(' ');
+						this.firstName = names[0];
+						this.lastName = names[names.length - 1];
+					}
+				}
+			}
+		});
+	</script>
+</html>

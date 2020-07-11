@@ -1,0 +1,56 @@
+<html>
+    <head>
+        <title>插槽</title>
+    </head>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <body>
+        <div id="app">
+            <component
+                v-bind:info="des"
+            >
+                123
+                <template v-slot:two>xujiajun</template>
+                <template v-slot:one>
+                    <button>xujiajun</button>
+                </template>
+                <p>duanluo</p>
+                <!-- 通过作用域插槽访问绑定在当前slot上的全部props -->
+                <template v-slot:diy="scope">{{ scope.info.firstName }}</template>
+            </component>
+        </div>
+    </body>
+    <script>
+        let vm = new Vue({
+            el: '#app',
+            components: {
+                component: {
+                    template: `
+                        <div>
+                            <p>{{ info }}</p>
+                            <slot name="one">one</slot>
+                            <br>
+                            <slot>default</slot>
+                            <br>
+                            <slot name="two">two</slot>
+                            <p></p>
+                            <slot name="diy" v-bind:info="user">{{ user.lastName }}</slot>
+                        </div>
+                    `,
+                    props: ['info'],
+                    data: function () {
+                        return {
+                            user: {
+                                id: 1,
+                                firstName: "徐",
+                                lastName: "家俊"
+                            }
+                        }
+                    }
+                }
+            },
+            data: {
+                des: '插槽test'
+            }
+        });
+    </script>
+</html>
