@@ -40,19 +40,19 @@
 
 ​		通过排查发现, 基础服务项目中, 对Spring的消息转换器进行了自动配置, 如图:
 
-![微信截图_20200715181721](D:\notes\img\一个错误的消息转换器自动配置类.png)
+![微信截图_20200715181721](.\img\一个错误的消息转换器自动配置类.png)
 
-可以看到, 自己创建一个HttpMessageConverters对象, 并交给了Spring容器管理, 我们翻看SpringBoot的源码, 找一下它的消息转化器自动配置类, 如下:![](D:\notes\img\SpringBoot消息转换器自动配置类.png)
+可以看到, 自己创建一个HttpMessageConverters对象, 并交给了Spring容器管理, 我们翻看SpringBoot的源码, 找一下它的消息转化器自动配置类, 如下:![](.\img\SpringBoot消息转换器自动配置类.png)
 
 当容器中不存在HttpMessageConverters时, 会创建一个HttpMessageConverters, 我们继续进到它的构造器里:
 
-![HttpMessageConverters构造器](D:\notes\img\HttpMessageConverters构造器.png)
+![HttpMessageConverters构造器](.\img\HttpMessageConverters构造器.png)
 
-注意这里的getDefaultConverters()方法, 我在进到这个方法里一路进去后, 发现最终Spring创建很多默认的消息转换器:![添加默认消息转换器](D:\notes\img\添加默认消息转换器.png)
+注意这里的getDefaultConverters()方法, 我在进到这个方法里一路进去后, 发现最终Spring创建很多默认的消息转换器:![添加默认消息转换器](.\img\添加默认消息转换器.png)
 
 最后最关键的一步来了:
 
-![消息转换器的添加顺序](D:\notes\img\消息转换器的添加顺序.png)
+![消息转换器的添加顺序](.\img\消息转换器的添加顺序.png)
 
 现在, 我们知道了消息转换器的添加, 以及知道了消息转换器在添加的时候是有顺序的, 那么跟我们的bug有什么关系呢, 我们在对比了上传后的json和原始json后, 发现经过基础服务接口上传的json, 内容中出现了一些**""**, <u>即原本应该为: {"id": "1"}的地方, 变成了: {"\"id\"": ""1""}</u>, 
 
@@ -72,7 +72,7 @@ String jsonString = objectMapper.writeValueAsString(json);  // jsonString = "\"\
 
 ​		从DispatcherServlet开始, 一直找请求参数是怎么被消息转换器处理的, 最后看到源码处:
 
-![消息转换器的处理逻辑](D:\notes\img\消息转换器的处理逻辑.png)
+![消息转换器的处理逻辑](.\img\消息转换器的处理逻辑.png)
 
 由于消息转换器是按照顺序被取出的, 因此第一个被取出的就是我们配置的FastJsonHttpMessageConverter, 它是用来处理json字符串的, <u>**本质上是一个特殊的字符串消息转换器**</u>, 而Spring本身是提供了处理普通字符串的StringHttpMessageConverter类的, 由于我们的配置,  FastJsonHttpMessageConverter跑到了数组的最前面, 来不及被StringHttpMessageConverter处理, 就被当做了json字符串处理, 因此, 我们向基础服务传参的全部参数, 都被当做json字符串处理了
 

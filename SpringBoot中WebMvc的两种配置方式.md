@@ -66,11 +66,11 @@ class WebMvcConfigurerComposite implements WebMvcConfigurer {
 
 ​		**WebMvcConfigurationSupport 在整个程序中只会有一个生效, 如果用户已经实现了WebMvcConfigurationSupport , 则DelegatingWebMvcConfigurationSupport 不会生效(因为DelegatingWebMvcConfigurationSupport 继承WebMvcConfigurationSupport ), 而所有实现WebMvcConfigurer接口的实例被DelegatingWebMvcConfigurationSupport 持有, 因此WebMvcConfigurer的所有实现类都不会生效**, 在Spring中, 当WebMvcConfigurationSupport 实例不存在时(用户没有继承它的实例), Spring会默认初始化DelegatingWebMvcConfigurationSupport 
 
-![WebMvcAutoConfiguration的触发条件](D:\notes\img\WebMvcAutoConfiguration的触发条件.png)
+![WebMvcAutoConfiguration的触发条件](.\img\WebMvcAutoConfiguration的触发条件.png)
 
 而如果我们也没有WebMvcConfigurer的实例, 则Spring会启用一个默认的实现类:
 
-![WebMvcConfigurer默认实现](D:\notes\img\WebMvcConfigurer默认实现.png)
+![WebMvcConfigurer默认实现](.\img\WebMvcConfigurer默认实现.png)
 
 
 
