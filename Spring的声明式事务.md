@@ -84,19 +84,20 @@ public class XXXServiceImpl implement XXXService {
 > 
 > 	// 方法A
 > 	public void methodA() {
->         // 使用代理对象去调用methodB
->         this.currentProxy().methodB();
->     }
->     
->     // 添加的声明式事务注解的方法B
->     @Transactional
->     public void methodB() {
->         throw new RuntimeException("test transactional!");
->     }
->     
->     private XXXService currentProxy() {
->         return (XXXService) AopContext.currentProxy();
->     }
+>      	// 使用代理对象去调用methodB
+>      	this.currentProxy().methodB();
+>  	}
+>  
+>  	// 添加的声明式事务注解的方法B
+>  	@Transactional
+>  	public void methodB() {
+>      	throw new RuntimeException("test transactional!");
+>  	}
+>  
+>     // 该方法需要开启@EnableAspectJAutoProxy
+>  	private XXXService currentProxy() {
+>      	return (XXXService) AopContext.currentProxy();
+>  	}
 > }
 > ```
 
