@@ -28,12 +28,16 @@
 
      ```
      systemctl start firewall.service
+     # 或者
+     service firewalld start
      ```
 
    - **关闭防火墙**: 
 
      ```
      systemctl stop firewall.service
+     # 或者
+     service firewalld stop
      ```
 
    - **添加放行端口**: 
